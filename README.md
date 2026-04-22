@@ -4,10 +4,10 @@ An AI-driven orchestration system that routes content to persona-based bots, enr
 
 ## Features
 
-- **🎯 Semantic Routing**: Vector-based routing to 3 distinct bot personas using FAISS
-- **🔍 RAG Pipeline**: LangGraph-powered workflow with web search integration
-- **🛡️ Defense Layer**: Keyword-based jailbreak detection
-- **⚡ Production Ready**: Pydantic validation, error handling, logging
+- **Semantic Routing**: Vector-based routing to 3 distinct bot personas using FAISS
+- **RAG Pipeline**: LangGraph-powered workflow with web search integration
+- **Defense Layer**: Keyword-based jailbreak detection
+- **Production Ready**: Pydantic validation, error handling, logging
 
 ## Architecture
 
