@@ -1,0 +1,8 @@
+faiss-cpu
+sentence-transformer
+numpy
+ddgs
+langgraph
+langchain
+duckduckgo-search
+langchain_groq
