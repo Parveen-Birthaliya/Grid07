@@ -76,8 +76,6 @@ docs/
 ├── architecture.md     # System architecture
 └── README.md          # This file
 
-test_phases.py         # Integrated testing script
-test_defense.py        # Defense layer tests
 Grid07_Complete.ipynb  # Jupyter notebook showcase
 ```
 
@@ -90,17 +88,7 @@ Key settings in `src/config.py`:
 - `EMBEDDING_MODEL`: sentence-transformers/all-MiniLM-L6-v2
 - `LLM_MODEL`: llama-3.1-8b-instant (via Groq)
 
-## Testing
 
-Run all phases:
-```bash
-python test_phases.py
-```
-
-Test defense layer:
-```bash
-python test_defense.py
-```
 
 ## Bot Personas
 
