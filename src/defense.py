@@ -24,6 +24,7 @@ class JailbreakDetector:
     
     def detect_jailbreak(self, text: str, conversation_history: Optional[List[ConversationMessage]] = None) -> JailbreakDetectionResult:
         
+        logger.info("Running jailbreak detection")
         text_lower = text.lower()
         detected_keywords = []
         
@@ -31,10 +32,12 @@ class JailbreakDetector:
         for keyword in JAILBREAK_KEYWORDS:
             if keyword in text_lower:
                 detected_keywords.append(keyword)
-        
+        logger.info("Detected %d suspicious keywords", len(detected_keywords))
+
         # Determine if jailbreak based on keywords found
         is_jailbreak = len(detected_keywords) >= 1
-        
+        if is_jailbreak:
+            logger.warning("Potential jailbreak attempt detected")
         # Set confidence level based on number of keywords
         if len(detected_keywords) >= 3:
             confidence = ConfidenceLevel.HIGH
@@ -44,7 +47,8 @@ class JailbreakDetector:
             confidence = ConfidenceLevel.LOW
         
         reason = f"Found keywords: {', '.join(detected_keywords)}" if detected_keywords else None
-        
+        logger.info("Jailbreak detection completed")
+
         return JailbreakDetectionResult(
             is_jailbreak=is_jailbreak,
             confidence=confidence,
@@ -58,10 +62,13 @@ class DefenseEngine:
     
     def __init__(self):
         self.detector = JailbreakDetector()
+        logger.info("DefenseEngine initialized")
     
     def process_with_defense(self, state: AgentState) -> dict:
         """Check if query is jailbreak attempt"""
+        logger.info("Processing query through defense layer")
         result = self.detector.detect_jailbreak(state.query)
+        logger.info("Defense check completed. Blocked: %s", result.is_jailbreak)
         
         return {
             "is_blocked": result.is_jailbreak,
