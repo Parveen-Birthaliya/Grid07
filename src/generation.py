@@ -2,10 +2,10 @@
 
 from langchain_groq import ChatGroq
 from langgraph.graph import StateGraph, END
-from typing import List, Dict, Optional
+from typing import List
 import logging
 import json
-from uuid import uuid4 
+
 
 from .models import AgentState, SearchResult
 from .config import LLM_MODEL, LLM_TEMPERATURE
@@ -26,9 +26,12 @@ def mock_search(query: str) -> str:
             return result
     
     return "Markets show mixed signals. Analysts debate economic outlook."
+
+
 def duckduckgo_search_tool(query: str) -> List[str]:
     """Real-time search using DuckDuckGo. Returns top 5 results."""
     results = []
+    logger.info("Running DuckDuckGo search for query: %s", query)
     try:
         from ddgs import DDGS
         with DDGS() as client:
@@ -39,14 +42,15 @@ def duckduckgo_search_tool(query: str) -> List[str]:
                 formatted = f"{title} — {snippet}"
                 results.append(formatted)
     except Exception as e:
-        logger.error(f"Search failed: {e}")
-        results.append(f"Search error: {str(e)}")
-    
+        logger.error("Search failed: %s", e)
+        results.append(f"Search error: {e}")
+    logger.info("Retrieved %d search results", len(results))
     return results if results else ["No results found."]
 
 
 def decide_search(state: AgentState) -> dict:
     """Node 1: Bot decides what topic to search"""
+    logger.info("Deciding search topic for query: %s", state.query)
     llm = ChatGroq(
         model=LLM_MODEL,
         temperature=LLM_TEMPERATURE,
@@ -68,6 +72,7 @@ def decide_search(state: AgentState) -> dict:
     
     response = llm.invoke(prompt)
     data = json.loads(response.content)
+    logger.info("Generated search topic: %s", data.get("topic", ""))
 
     return {
         "topic": data.get("topic", ""),
@@ -77,6 +82,7 @@ def decide_search(state: AgentState) -> dict:
 
 def web_search(state: AgentState) -> dict:
     """Node 2: Execute search query"""
+    logger.info("Executing web search")
     search_query = state.search_query or state.query
     
     try:
@@ -90,16 +96,18 @@ def web_search(state: AgentState) -> dict:
             source="duckduckgo",
             retry_count=0
         )
+        logger.info("Web search completed successfully")
         return {"search_results": search_result}
     except Exception as e:
-        logger.error(f"Search failed: {e}")
+        logger.error("Search failed: %s", e)
         return {"error": f"Search failed: {str(e)}"}
 
 
 def draft_post(state: AgentState) -> dict:
     """Node 3: Generate opinionated post"""
-    
+    logger.info("Generating opinionated post")
     if not state.matched_bots:
+        logger.warning("No matched bots found for post generation")
         return {"error": "No bot matched"}
     
     bot = state.matched_bots[0]
@@ -129,6 +137,7 @@ def draft_post(state: AgentState) -> dict:
 
     response = llm.invoke(prompt)
     data = json.loads(response.content)
+    logger.info("Post generated successfully for bot: %s", bot.bot_id)
 
     return {
         "generated_post": data.get("post_content", ""),
@@ -138,6 +147,7 @@ def draft_post(state: AgentState) -> dict:
 
 def build_generation_graph():
     """Build and compile LangGraph pipeline"""
+    logger.info("Building generation graph")
     builder = StateGraph(AgentState)
 
     # Add nodes

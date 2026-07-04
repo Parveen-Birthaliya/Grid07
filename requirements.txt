@@ -1,5 +1,5 @@
 faiss-cpu
-sentence-transformer
+sentence-transformers
 numpy
 ddgs
 langgraph
