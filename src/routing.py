@@ -37,7 +37,7 @@ class VectorRouter:
         self.index.add(self.persona_embedding)
         logger.info("VectorRouter initialized with %d personas", len(self.persona_keys))
 
-    @@staticmethod
+    @staticmethod
     def _get_confidence(score: float) -> ConfidenceLevel:
         if score > 0.8:
             return ConfidenceLevel.HIGH
